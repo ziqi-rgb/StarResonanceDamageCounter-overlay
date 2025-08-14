@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>伤害统计</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="title-bar">
+            <div class="title-container">
+                <span id="window-title-text">正在加载...</span>
+                <button id="edit-title-btn" class="title-btn hidden" title="编辑昵称">✏️</button>
+            </div>
+            <div class="controls">
+                <button id="favorite-btn" class="title-btn hidden" title="收藏为默认角色">☆</button>
+                <button id="close-btn" class="title-btn" title="关闭">✕</button>
+            </div>
+        </div>
+
+        <div id="user-control-panel">
+            <div class="control-row">
+                <button id="dropdown-toggle-btn" title="选择角色UID">▾</button>
+                <input type="text" id="uid-input" placeholder="输入或选择角色UID" autocomplete="off">
+                <button id="retarget-uid-btn" title="刷新当前窗口为当前UID">🔄</button>
+            </div>
+             <div class="control-row">
+                <button id="track-uid-btn" title="为框中UID新建追踪窗口">▸</button>
+            </div>
+            <div id="custom-dropdown" class="hidden"></div>
+        </div>
+
+        <div id="stats-container"></div>
+        <div id="status-message" class="hidden">...</div>
+        
+        <div id="bottom-controls">
+            <button id="clear-stats-btn" title="清除统计数据">🗑️</button>
+            <button id="skill-details-btn" class="title-btn hidden" title="查看技能详情">📄</button>
+            <button id="team-stats-toggle-btn" title="团队统计">📊</button>
+            <button id="lock-toggle-btn" class="locked" title="锁定/解锁 (Ctrl+L)">🔒</button>
+            <button id="theme-toggle-btn" title="外观设置">🎨</button>
+            <button id="settings-toggle" title="数据显示设置">⚙️</button>
+        </div>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+</html>

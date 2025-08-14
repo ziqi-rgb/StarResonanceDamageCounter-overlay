@@ -1,0 +1,25 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+    resizeWindow: (width, height) => ipcRenderer.send('resize-window', width, height),
+    getNicknames: () => ipcRenderer.invoke('get-nicknames'),
+    setNickname: (uid, nickname) => ipcRenderer.invoke('set-nickname', uid, nickname),
+    fetchData: () => ipcRenderer.invoke('fetch-data'),
+    toggleLockState: (isLocked) => ipcRenderer.send('toggle-lock-state', isLocked),
+    createNewWindow: (uid) => ipcRenderer.send('create-new-window', uid),
+    closeWindow: () => ipcRenderer.send('close-window'),
+    onGlobalToggleLock: (callback) => ipcRenderer.on('global-toggle-lock', callback),
+    onSettingsUpdated: (callback) => ipcRenderer.on('settings-updated', callback),
+    resizePanel: (width, height) => ipcRenderer.send('resize-panel', width, height),
+    toggleSettingsWindow: () => ipcRenderer.send('toggle-settings-window'),
+    toggleThemeWindow: () => ipcRenderer.send('toggle-theme-window'),
+    notifySettingsChanged: () => ipcRenderer.send('notify-settings-changed'),
+    toggleTeamStatsWindow: () => ipcRenderer.send('toggle-team-stats-window'),
+    toggleSkillDetailsWindow: (uid) => ipcRenderer.send('toggle-skill-details-window', uid),
+    fetchSkillData: (uid) => ipcRenderer.invoke('fetch-skill-data', uid),
+    onTeamDataUpdate: (callback) => ipcRenderer.on('team-data-update', (event, data) => callback(data)),
+    updateMainWindowTarget: (uid) => ipcRenderer.send('update-main-window-target', uid),
+    getFavoriteUid: () => ipcRenderer.invoke('get-favorite-uid'),
+    toggleFavoriteUid: (uid) => ipcRenderer.invoke('toggle-favorite-uid', uid),
+    clearStatsData: () => ipcRenderer.invoke('clear-stats-data'),
+});

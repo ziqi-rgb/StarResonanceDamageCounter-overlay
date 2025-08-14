@@ -1,0 +1,315 @@
+/* --- 1. 全局变量与基础样式 --- */
+:root {
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family-mono: 'Consolas', 'Monaco', monospace;
+    --font-size-title: 15px;
+    --font-size-normal: 13px;
+    --font-size-small: 11px;
+    --color-text: #f0f0f0;
+    --color-label: #a0a0c0;
+    --color-bg-container: rgba(30, 30, 40, 0.85);
+    --color-panel-bg: rgba(45, 45, 60, 0.95);
+    --color-border: rgba(100, 100, 120, 0.5);
+    --color-interactive: #4a6a8a;
+    --color-interactive-hover: #5a7a9a;
+    --color-input-bg: #2b2b36;
+    --color-progress: #4a90e2;
+}
+
+body, html {
+    font-family: var(--font-family);
+    background-color: transparent;
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    user-select: none;
+    font-size: var(--font-size-normal);
+}
+
+/* --- 新增：独立面板窗口的body样式 --- */
+.panel-body {
+    background-color: var(--color-panel-bg);
+    border-radius: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+/* --- 2. 主容器与布局 --- */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    background-color: var(--color-bg-container);
+    border-radius: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+    -webkit-app-region: drag;
+}
+
+.hidden { display: none !important; }
+hr { border: none; border-top: 1px solid var(--color-border); margin: 10px 0; }
+
+/* --- 3. 顶部组件 --- */
+.title-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 8px; margin-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+.title-container { flex-grow: 1; display: flex; align-items: center; gap: 6px; min-width: 0; }
+#window-title-text {
+    font-size: var(--font-size-title); font-weight: bold;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.title-input {
+    flex-grow: 1; font-size: var(--font-size-title); font-weight: bold;
+    background-color: var(--color-input-bg); color: var(--color-text);
+    border: 1px solid var(--color-border); border-radius: 4px;
+    padding: 1px 4px; min-width: 0; -webkit-app-region: no-drag;
+}
+.title-btn {
+    -webkit-app-region: no-drag; background: none; border: none;
+    color: var(--color-text); cursor: pointer; padding: 0;
+    font-size: var(--font-size-title);
+}
+.title-btn:hover { opacity: 0.8; }
+
+/* --- 4. 用户控制面板 --- */
+#user-control-panel {
+    position: relative; margin-bottom: 8px; flex-shrink: 0;
+    -webkit-app-region: no-drag;
+}
+.control-row { display: flex; gap: 5px; margin-bottom: 5px; }
+#dropdown-toggle-btn { width: 26px; height: 26px; background-color: var(--color-input-bg); border: 1px solid var(--color-border); border-radius: 4px; }
+#uid-input { flex-grow: 1; background-color: var(--color-input-bg); color: var(--color-text); border: 1px solid var(--color-border); border-radius: 4px; padding: 0 8px; min-width: 0; }
+#retarget-uid-btn { width: 26px; height: 26px; font-size: 16px; background-color: var(--color-input-bg); border: 1px solid var(--color-border); border-radius: 4px; }
+#track-uid-btn { width: 100%; background-color: var(--color-interactive); border: none; color: #fff; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+#track-uid-btn:hover { background-color: var(--color-interactive-hover); }
+#custom-dropdown {
+    position: absolute; top: 31px; left: 0; right: 0;
+    background-color: #3a3a4a; border: 1px solid var(--color-border);
+    border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 1000;
+}
+.dropdown-option { padding: 6px 8px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dropdown-option:hover { background-color: var(--color-interactive); }
+
+/* --- 5. 统计与状态 --- */
+#stats-container {
+    flex-grow: 1; overflow: hidden; /* 由JS控制高度，不再需要滚动条 */
+    -webkit-app-region: no-drag;
+}
+.stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2px 0;
+}
+.stat-label { color: var(--color-label); }
+.stat-value { font-family: var(--font-family-mono); font-weight: bold; }
+
+/* --- 全新布局：进度条行 --- */
+.progress-label-row {
+    padding: 2px 0;
+}
+.progress-bar-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 2px 0;
+}
+.progress-bar {
+    flex-grow: 1; height: 10px; background-color: #333;
+    border-radius: 5px; overflow: hidden;
+}
+.progress-bar-fill {
+    width: 0%; height: 100%; background-color: var(--color-progress);
+    border-radius: 5px; transition: width 0.3s ease-in-out;
+}
+.progress-bar-text {
+    font-family: var(--font-family-mono); font-size: var(--font-size-small);
+    flex-shrink: 0;
+}
+#status-message {
+    flex-grow: 1; display: flex; justify-content: center;
+    align-items: center; color: var(--color-label);
+}
+
+/* --- 6. 底部与浮动面板 --- */
+#bottom-controls {
+    display: flex; justify-content: space-around; padding-top: 8px;
+    margin-top: auto; /* 将其推到底部 */
+    border-top: 1px solid var(--color-border); flex-shrink: 0;
+    -webkit-app-region: no-drag;
+}
+#bottom-controls button {
+    font-size: 18px; background: none; border: none;
+    color: var(--color-text); cursor: pointer;
+}
+#lock-toggle-btn.locked { opacity: 0.5; }
+
+/* --- 独立面板样式 --- */
+.panel.standalone {
+    border: none; box-shadow: none;
+    width: 100%; height: 100%;
+    position: static;
+}
+.setting-item, .theme-item {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+}
+.setting-item label, .theme-item label { display: flex; align-items: center; gap: 5px; }
+.theme-item input[type="range"] { width: 100px; }
+.theme-item input[type="color"] { width: 30px; height: 20px; border: none; background: none; padding: 0; }
+.font-style-btn {
+    background: var(--color-input-bg); border: 1px solid var(--color-border);
+    color: var(--color-text); width: 28px; height: 28px;
+    border-radius: 4px; cursor: pointer;
+}
+.font-style-btn.active { background: var(--color-interactive); border-color: var(--color-interactive-hover); }
+.font-style-btn[data-style="bold"] { font-weight: bold; }
+.font-style-btn[data-style="italic"] { font-style: italic; }
+
+/* --- 新增：独立面板窗口的body样式 --- */
+.panel-body {
+    background-color: var(--color-panel-bg);
+    border-radius: 8px;
+    padding: 0; 
+    box-sizing: border-box;
+    
+    /* ========== 核心修正：让body本身收缩以包裹内容 ========== */
+    /* 移除 display: flex 和 height: 100vh */
+    /* 新增 width 和 height 为 max-content */
+    width: max-content;
+    height: max-content;
+    /* ====================== 修正结束 ======================== */
+}
+
+/* --- 顶部拖拽栏的样式 --- */
+.panel-title-bar {
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--color-label);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    -webkit-app-region: drag;
+}
+
+/* --- .panel.standalone 的样式 --- */
+.panel.standalone {
+    border: none; box-shadow: none;
+    /* 修正：不再需要 width: 100%，因为它现在由父级body的max-content决定 */
+    position: static;
+    -webkit-app-region: no-drag;
+    padding: 8px; 
+    box-sizing: border-box;
+    /* 修正：不再需要flex-grow，因为布局不再是flex */
+    overflow-y: auto; /* 保持内容超长时可滚动 */
+}
+
+/* ========== 核心修正：新增一个用于宽度自适应的工具类 ========== */
+.auto-width {
+    /* 强制元素宽度由其内容决定，而不是由父容器决定 */
+    width: max-content;
+    /* 设置一个最小宽度，防止内容过少时窗口变得太窄 */
+    min-width: 100px;
+}
+/* ====================== 修正结束 ======================== */
+
+.cell-center {
+    text-align: center;
+}
+
+.cell-right {
+    text-align: right;
+    font-family: var(--font-family-mono); /* 使用等宽字体让数字更好看 */
+}
+
+/* ====================== 修正结束 ======================== */
+
+
+/* ==========================================================================
+   7. 面板特定样式微调 (完整模板)
+   ========================================================================== */
+
+/* --- 技能详情窗口 (#skill-table) --- */
+
+/* 控制整个窗口的最小宽度 */
+/* 作用：防止窗口在内容很少时变得过窄。 */
+/*技能详情表格*/
+#skill-container.auto-width {
+    min-width: 550px; /* 您可以调整这个数值，比如 500px 或 450px */
+}
+/* 外观设置窗口 (#theme-panel) --- */
+#theme-panel.auto-width {
+    /* 控制整个外观设置窗口的最小宽度 */
+    min-width: 230px; 
+    max-width: 240px;
+}
+/* 显示设置窗口 (#settings-panel) --- */
+#settings-panel.auto-width {
+    /* 控制整个显示设置窗口的最小宽度 */
+    min-width: 200px;
+}
+/* 团队统计窗口 (#team-container) --- */
+/* 控制整个团队统计窗口的最小宽度 */
+#team-container.auto-width {
+    min-width: 350px;
+}
+/* 控制表格内每一列的宽度 */
+/* 说明： */
+/* - width:          强制设定一个固定宽度。 */
+/* - min-width:      设定一个最小宽度，但允许内容把它撑得更宽。 */
+/*                   对于像技能名这样长度不一的内容，使用 min-width 更灵活。 */
+/* 属性 */
+#skill-table th:nth-child(1),
+#skill-table td:nth-child(1) {
+    width: 50px;
+}
+/* 技能名称 */
+#skill-table th:nth-child(2),
+#skill-table td:nth-child(2) {
+    min-width: 80px;
+}
+/* 类型 */
+#skill-table th:nth-child(3),
+#skill-table td:nth-child(3) {
+    min-width: 50px;
+}
+/* 次数 */
+#skill-table th:nth-child(6),
+#skill-table td:nth-child(6) {
+    min-width: 50px;
+}
+/* 暴击率 */
+#skill-table th:nth-child(7),
+#skill-table td:nth-child(7) {
+    width: 50px;
+}
+/* 幸运率 */
+#skill-table th:nth-child(8),
+#skill-table td:nth-child(8) {
+    width: 50px;
+}
+/* 总伤害 */
+#skill-table th:nth-child(4),
+#skill-table td:nth-child(4) {
+    min-width: 50px;
+}
+/* 占比 */
+#skill-table th:nth-child(5),
+#skill-table td:nth-child(5) {
+    width: 50px;
+}
+
+
+/* 控制成员统计行内各个部分的宽度，以实现对齐和美观 */
+.member-stat-label {
+    /* 标签 (输出/治疗/承伤) */
+    width: 60px;
+}
+.value {
+    /* 数值 (e.g., 1,234,567) */
+    width: 85px; 
+}
+.percentage {
+    /* 百分比 (e.g., 100.0%) */
+    width: 60px;
+}
