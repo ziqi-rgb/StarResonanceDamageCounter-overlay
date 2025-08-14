@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="panel-body">
+    <div class="panel-title-bar">外观设置</div>
+    <div id="theme-panel" class="panel standalone auto-width">
+        <div class="theme-item">
+            <label>透明度:</label>
+            <input type="range" id="opacity-slider" min="0.2" max="1" step="0.05">
+        </div>
+        <div class="theme-item">
+            <label>窗口底色:</label>
+            <input type="color" id="bg-color-picker">
+        </div>
+        <div class="theme-item">
+            <span>字体样式:</span>
+            <div>
+                <button id="font-bold-toggle" class="font-style-btn" data-style="bold">B</button>
+                <button id="font-italic-toggle" class="font-style-btn" data-style="italic">I</button>
+            </div>
+        </div>
+    </div>
+    <script src="theme-renderer.js"></script>
+</body>
+</html>
