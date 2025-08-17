@@ -180,7 +180,18 @@ app.whenReady().then(async () => {
     createMainWindow({ targetUid: favoriteUid });
     app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createMainWindow({ targetUid: store.get('favoriteUid') }); });
     globalShortcut.register('CommandOrControl+L', () => BrowserWindow.getAllWindows().forEach(w => w.webContents.send('global-toggle-lock')));
+    // 新增：为清除统计数据功能添加快捷键 (Ctrl+R)
+    globalShortcut.register('CommandOrControl+R', () => {
+        const mainWindow = BrowserWindow.getAllWindows().find(win => {
+            const url = win.webContents.getURL();
+            return url.includes('index.html') && url.includes('uid=main');
+        });
+        if (mainWindow) {
+            mainWindow.webContents.send('global-clear-stats-request');
+        }
+    });
     app.on('will-quit', () => globalShortcut.unregisterAll());
 });
+
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
