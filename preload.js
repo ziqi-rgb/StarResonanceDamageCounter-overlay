@@ -20,7 +20,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     fetchData: () => ipcRenderer.invoke('fetch-data'),
     fetchSkillData: (uid) => ipcRenderer.invoke('fetch-skill-data', uid),
     clearStatsData: () => ipcRenderer.invoke('clear-stats-data'),
-
+    // 新增：监听从主进程发来的全局清除统计数据请求
+    onGlobalClearStatsRequest: (callback) => ipcRenderer.on('global-clear-stats-request', callback),
+    
     // 本地存储 (昵称 & 收藏)
     getNicknames: () => ipcRenderer.invoke('get-nicknames'),
     setNickname: (uid, nickname) => ipcRenderer.invoke('set-nickname', uid, nickname),
@@ -38,4 +40,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onTeamDataUpdate: (callback) => ipcRenderer.on('team-data-update', (event, data) => callback(data)),
     onSettingsUpdated: (callback) => ipcRenderer.on('settings-updated', callback),
     notifySettingsChanged: () => ipcRenderer.send('notify-settings-changed'),
+    
 });
