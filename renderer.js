@@ -242,9 +242,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     elements.themeToggleBtn.addEventListener('click', () => window.electronAPI.toggleThemeWindow());
     window.electronAPI.onSettingsUpdated(() => { loadAndApplyTheme(); if (appState.currentDisplayUid && appState.lastData) initializeAndRender(appState.lastData.user[appState.currentDisplayUid]); });
     elements.favoriteBtn.addEventListener('click', async () => { if (appState.currentDisplayUid) { const newFav = await window.electronAPI.toggleFavoriteUid(appState.currentDisplayUid); appState.favoriteUid = newFav ? newFav.toString() : null; updateFavoriteButtonState(); } });
-    elements.clearStatsBtn.addEventListener('click', async () => { if (confirm('确定要清除所有统计数据吗？此操作不可撤销。')) await window.electronAPI.clearStatsData(); });
+    //改动：功能 - 从弹出二次确认窗口改为直接清除数据
+    elements.clearStatsBtn.addEventListener('click', async () => {
+        await window.electronAPI.clearStatsData();
+    });
+    // 原：if (confirm('您确定要清除所有统计数据吗？此操作不可撤销。')) await window.electronAPI.clearStatsData();
     elements.skillDetailsBtn.addEventListener('click', () => { if (appState.currentDisplayUid) window.electronAPI.toggleSkillDetailsWindow(appState.currentDisplayUid); });
 
+    // 新增：监听全局清除快捷键 (Ctrl+R)
+    window.electronAPI.onGlobalClearStatsRequest(() => {
+        // 使用快捷键触发时，跳过确认，直接清除
+        window.electronAPI.clearStatsData();
+    });
     // --- 5. 启动流程 ---
     appState.nicknames = await window.electronAPI.getNicknames();
     appState.favoriteUid = await window.electronAPI.getFavoriteUid();
@@ -264,4 +273,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAndApplyTheme();
     toggleLock(appState.isLocked); 
     mainLoop();
+
 });
