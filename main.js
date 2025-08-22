@@ -128,12 +128,43 @@ app.whenReady().then(async () => {
         }
     });
 
-    ipcMain.handle('clear-stats-data', async () => {
+     ipcMain.handle('clear-stats-data', async () => {
         try {
             await axios.get('http://localhost:8989/api/clear');
+            
+            //修正：修正了清除数据后团队统计不更新的bug。
+            //原bug表现：清除数据后，团队统计面板会变为空白，且后续不再更新，除非创建新的追踪窗口。
+            //修正后表现：清除数据后，主进程会遍历所有当前打开的窗口，重新构建团队成员列表，并立即广播一次更新。这样团队统计面板就能正确地反映当前所有窗口的状态（显示成员，但数据为空），并在新数据到达后恢复正常更新。
+            const newTeamMembers = new Set();
+            const allWindows = BrowserWindow.getAllWindows();
+            for (const win of allWindows) {
+                const winUrl = win.webContents.getURL();
+                // 确保窗口URL有效且是我们的主应用窗口
+                if (winUrl && winUrl.includes('index.html')) {
+                    try {
+                        const params = new URL(winUrl).searchParams;
+                        const uid = params.get('uid');
+                        // 只添加追踪窗口的UID (uid不为'main')
+                        if (uid && uid !== 'main') {
+                            newTeamMembers.add(uid);
+                        }
+                    } catch (e) {
+                        console.error("在清除统计时解析窗口URL失败:", e);
+                    }
+                }
+            }
+             // 使用重新扫描到的窗口列表替换旧的成员列表
             teamMembers.clear();
-            mainWindowTargetUid = null;
-            setTimeout(broadcastTeamData, 200);
+            newTeamMembers.forEach(uid => teamMembers.add(uid));
+
+            // 立刻广播更新，团队统计窗口会收到新的成员列表和空的统计数据
+            broadcastTeamData();
+
+            //删改：移除了会错误地清除所有追踪状态的逻辑
+            //teamMembers.clear();
+            //mainWindowTargetUid = null;
+            //setTimeout(broadcastTeamData, 200);
+
             return { success: true };
         } catch (error) {
             return { success: false, error: error.message };
@@ -195,3 +226,4 @@ app.whenReady().then(async () => {
 
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+
